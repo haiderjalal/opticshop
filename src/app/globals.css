@@ -1,0 +1,235 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-figtree);
+  --font-heading: var(--font-bricolage);
+  --font-mono: var(--font-jetbrains);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-coat-green: var(--coat-green);
+  --color-coat-violet: var(--coat-violet);
+  --color-status-pending: var(--status-pending);
+  --color-status-lab: var(--status-lab);
+  --color-status-ready: var(--status-ready);
+  --color-status-done: var(--status-done);
+  --color-success: var(--success);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/*
+  Palette — "lens coating":
+  paper #F4F6F8 · ink #0F1B2D · steel #5B6B7F
+  coating green #14B88A → coating violet #6D4AFF (the reflex you see on an AR-coated lens)
+  --brand is overridden per shop from Settings (white-label).
+*/
+:root {
+  --brand: #0f1b2d;
+  --background: #f4f6f8;
+  --foreground: #0f1b2d;
+  --card: #ffffff;
+  --card-foreground: #0f1b2d;
+  --popover: #ffffff;
+  --popover-foreground: #0f1b2d;
+  --primary: var(--brand);
+  --primary-foreground: #ffffff;
+  --secondary: #e9edf2;
+  --secondary-foreground: #0f1b2d;
+  --muted: #eef1f5;
+  --muted-foreground: #5b6b7f;
+  --accent: #efebff;
+  --accent-foreground: #3d2bb5;
+  --destructive: #d23b3b;
+  --border: #dfe4ea;
+  --input: #d3dae3;
+  --ring: #6d4aff;
+  --radius: 0.7rem;
+  --coat-green: #14b88a;
+  --coat-violet: #6d4aff;
+  --status-pending: #b26b00;
+  --status-lab: #5b3fd6;
+  --status-ready: #0a8f73;
+  --status-done: #3f6b55;
+  --success: #0a8f73;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "tnum" 1;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-heading tracking-tight;
+  }
+  /* Keep focused fields (e.g. the first validation error) clear of the sticky header. */
+  input,
+  textarea,
+  select {
+    scroll-margin-top: 6rem;
+  }
+}
+
+@utility coating {
+  background-image: linear-gradient(120deg, var(--coat-green), var(--coat-violet));
+}
+
+/* Vertical variant for thin bars, so each bar reads as one coated surface. */
+@utility coating-v {
+  background-image: linear-gradient(to top, var(--coat-violet), var(--coat-green));
+}
+
+@utility coating-text {
+  background-image: linear-gradient(120deg, var(--coat-green), var(--coat-violet));
+  background-clip: text;
+  color: transparent;
+}
+
+@utility card-surface {
+  @apply rounded-2xl border bg-card shadow-[0_1px_0_rgba(15,27,45,0.04),0_8px_24px_-12px_rgba(15,27,45,0.12)];
+}
+
+/* ─── Motion ─────────────────────────────────────────────────────────────── */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes bar-grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.grow-x {
+  transform-origin: left;
+  animation: grow-x 0.9s 0.15s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes sheen {
+  from {
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  to {
+    transform: translateX(260%) skewX(-18deg);
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(12px, -10px) rotate(8deg);
+  }
+}
+
+.page-enter {
+  animation: rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Children fade up in sequence. Use on grids of cards and lists. */
+.stagger > * {
+  animation: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.stagger > *:nth-child(2) { animation-delay: 50ms; }
+.stagger > *:nth-child(3) { animation-delay: 100ms; }
+.stagger > *:nth-child(4) { animation-delay: 150ms; }
+.stagger > *:nth-child(5) { animation-delay: 200ms; }
+.stagger > *:nth-child(6) { animation-delay: 250ms; }
+.stagger > *:nth-child(n + 7) { animation-delay: 300ms; }
+
+/* Animated children become stacking contexts; lift the one in use so its dropdowns overlay its siblings. */
+.stagger > *:focus-within {
+  position: relative;
+  z-index: 10;
+}
+
+.bar {
+  transform-origin: bottom;
+  animation: bar-grow 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 16ms);
+}
+
+/* A light glint that crosses a surface once, like light across a lens. */
+.glint {
+  position: relative;
+  overflow: hidden;
+}
+.glint::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  animation: sheen 1.4s 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+  pointer-events: none;
+}
+
+.drift {
+  animation: drift 14s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
