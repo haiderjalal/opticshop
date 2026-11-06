@@ -16,7 +16,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     return (
       <main className="grid min-h-dvh place-items-center p-6">
         <div className="card-surface max-w-sm p-8 text-center">
-          <LensMark className="mx-auto mb-4 h-8 w-16" />
+          <LensMark animated className="mx-auto mb-4 h-10 w-20" />
           <h1 className="text-2xl font-bold">Waiting for access</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Your account is created, but the shop owner has not given it access yet. Ask them to add you, then sign in

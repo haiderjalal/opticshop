@@ -37,11 +37,17 @@ export function AppShell({ settings, children }: { settings: ShopSettings; child
       className="min-h-dvh lg:grid lg:grid-cols-[252px_1fr]"
       style={{ "--brand": settings.brand_color } as CSSProperties}
     >
+      <div className="scroll-progress" aria-hidden />
+
       <aside className="no-print sticky top-0 hidden h-dvh flex-col gap-6 border-r bg-card/60 px-4 py-5 backdrop-blur lg:flex">
         <div className="px-1">
           <ShopBrand settings={settings} />
         </div>
-        <Link href="/orders/new" className={cn(buttonVariants({ size: "lg" }), "glint w-full justify-between rounded-xl")}>
+        <Link
+          href="/orders/new"
+          transitionTypes={["nav-forward"]}
+          className={cn(buttonVariants({ size: "lg" }), "glint w-full justify-between rounded-xl")}
+        >
           <span className="flex items-center gap-2">
             <PlusIcon /> New order
           </span>
@@ -59,7 +65,10 @@ export function AppShell({ settings, children }: { settings: ShopSettings; child
       </aside>
 
       <div className="min-w-0">
-        <header className="no-print sticky top-0 z-30 border-b bg-background/80 backdrop-blur-lg">
+        <header
+          className="no-print sticky top-0 z-30 border-b bg-background/80 backdrop-blur-lg"
+          style={{ viewTransitionName: "site-header" } as CSSProperties}
+        >
           <div className="mx-auto flex h-16 max-w-[1320px] items-center gap-3 px-4 lg:px-8">
             <div className="lg:hidden">
               <ShopBrand settings={settings} compact />

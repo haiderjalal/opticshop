@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRightIcon, PlusIcon, TriangleAlertIcon } from "lucide-react";
+import { ArrowRightIcon, BoxesIcon, PlusIcon, ReceiptIcon, SearchIcon, TriangleAlertIcon, type LucideIcon } from "lucide-react";
 
 import { CountUp } from "@/components/shared/CountUp";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { buttonVariants } from "@/components/ui/button";
 import { ITEM_CATEGORIES } from "@/constants/app";
 import { getLowStock } from "@/features/inventory/queries";
 import { OrderRows } from "@/features/orders/components/OrderRows";
@@ -18,6 +17,21 @@ import { cn } from "@/lib/utils";
 export const metadata: Metadata = { title: "Today" };
 
 const OPEN_ON_DASHBOARD = 8;
+
+interface QuickAction {
+  href: string;
+  label: string;
+  hint: string;
+  icon: LucideIcon;
+  primary?: boolean;
+}
+
+const QUICK_ACTIONS: QuickAction[] = [
+  { href: "/orders/new", label: "New order", hint: "Book frames or lenses", icon: PlusIcon, primary: true },
+  { href: "/orders", label: "Find an order", hint: "By name, phone or number", icon: SearchIcon },
+  { href: "/expenses", label: "Add expense", hint: "Log what you spent", icon: ReceiptIcon },
+  { href: "/inventory?low=1", label: "Restock", hint: "See what's running low", icon: BoxesIcon },
+];
 
 function greeting(timeZone: string): string {
   const hour = Number(new Intl.DateTimeFormat("en-GB", { hour: "numeric", hourCycle: "h23", timeZone }).format(new Date()));
@@ -56,16 +70,41 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="mb-1 text-sm font-medium text-muted-foreground">{dateLabel}</p>
-          <h1 className="text-3xl font-bold sm:text-[2.1rem]">{greeting(settings.timezone)}</h1>
-        </div>
-        <Link href="/orders/new" className={cn(buttonVariants({ size: "lg" }), "glint rounded-xl lg:hidden")}>
-          <PlusIcon /> New order
-        </Link>
+    <div className="stagger space-y-6">
+      <div>
+        <span aria-hidden className="accent-bar mb-3" />
+        <p className="mb-1 text-sm font-medium text-muted-foreground">{dateLabel}</p>
+        <h1 className="text-3xl font-bold sm:text-[2.1rem]">{greeting(settings.timezone)}</h1>
       </div>
+
+      <nav aria-label="Quick actions" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {QUICK_ACTIONS.map(({ href, label, hint, icon: Icon, primary }) => (
+          <Link
+            key={href}
+            href={href}
+            className={cn(
+              "lift press group flex items-center gap-3 rounded-2xl p-4 sm:p-5",
+              primary ? "glint border-transparent bg-primary text-primary-foreground" : "card-surface hover:border-foreground/15",
+            )}
+          >
+            <span
+              className={cn(
+                "grid size-10 shrink-0 place-items-center rounded-xl",
+                primary ? "bg-white/15" : "bg-muted text-coat-violet",
+              )}
+            >
+              <Icon className="size-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[0.95rem] font-semibold">{label}</span>
+              <span className={cn("hidden truncate text-xs sm:block", primary ? "text-white/70" : "text-muted-foreground")}>
+                {hint}
+              </span>
+            </span>
+            <ArrowRightIcon className="size-4 shrink-0 opacity-60 motion-safe:transition-transform motion-safe:group-hover:translate-x-0.5" />
+          </Link>
+        ))}
+      </nav>
 
       <section aria-label="Today's figures" className="card-surface grid grid-cols-2 lg:grid-cols-4">
         {ledger.map((item, i) => {

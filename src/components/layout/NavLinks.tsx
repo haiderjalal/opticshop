@@ -30,13 +30,25 @@ const NAV: NavItem[] = [
   { href: "/settings", label: "Settings", icon: SettingsIcon },
 ];
 
+/** Left-to-right order of the app. Moving further along slides the new page in from the right. */
+const FLOW = ["/", "/orders", "/orders/new", "/inventory", "/expenses", "/reports", "/settings"];
+
 function isActive(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/";
   return pathname === href || (pathname.startsWith(`${href}/`) && pathname !== "/orders/new");
 }
 
+function currentFlowIndex(pathname: string): number {
+  return FLOW.findIndex((href) => isActive(pathname, href));
+}
+
+function directionTo(href: string, fromIndex: number): string {
+  return FLOW.indexOf(href) > fromIndex ? "nav-forward" : "nav-back";
+}
+
 export function SidebarNav() {
   const pathname = usePathname();
+  const fromIndex = currentFlowIndex(pathname);
   return (
     <nav aria-label="Main" className="flex flex-col gap-0.5">
       {NAV.map(({ href, label, icon: Icon }) => {
@@ -46,6 +58,7 @@ export function SidebarNav() {
             key={href}
             href={href}
             aria-current={active ? "page" : undefined}
+            transitionTypes={[directionTo(href, fromIndex)]}
             className={cn(
               "group relative flex h-10 items-center gap-3 rounded-xl px-3 text-[0.95rem] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
               active && "bg-muted text-foreground",
@@ -54,11 +67,11 @@ export function SidebarNav() {
             <span
               aria-hidden
               className={cn(
-                "absolute top-2 bottom-2 left-0 w-[3px] rounded-full coating transition-transform duration-300",
+                "absolute top-2 bottom-2 left-0 w-[3px] rounded-full coating transition-transform duration-300 ease-out",
                 active ? "scale-y-100" : "scale-y-0",
               )}
             />
-            <Icon className="size-[18px]" />
+            <Icon className="size-[18px] motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:scale-110" />
             {label}
           </Link>
         );
@@ -71,6 +84,7 @@ const MOBILE = [NAV[0], NAV[1], { href: "/orders/new", label: "New", icon: PlusI
 
 export function MobileNav() {
   const pathname = usePathname();
+  const fromIndex = currentFlowIndex(pathname);
   return (
     <nav
       aria-label="Main"
@@ -84,15 +98,26 @@ export function MobileNav() {
             key={href}
             href={href}
             aria-current={active ? "page" : undefined}
+            transitionTypes={[directionTo(href, fromIndex)]}
             className={cn(
-              "flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium text-muted-foreground",
+              "relative flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium text-muted-foreground transition-colors",
               active && "text-foreground",
             )}
           >
+            {!isNew && (
+              <span
+                aria-hidden
+                className={cn(
+                  "absolute top-0 h-[3px] w-8 rounded-b-full coating transition-transform duration-300 ease-out",
+                  active ? "scale-x-100" : "scale-x-0",
+                )}
+              />
+            )}
             <span
               className={cn(
-                "grid place-items-center rounded-full transition-transform active:scale-90",
-                isNew ? "size-9 bg-primary text-primary-foreground shadow-lg" : "size-6",
+                "grid place-items-center rounded-full transition-transform duration-300 ease-out motion-safe:active:scale-90",
+                isNew ? "ring-pulse size-9 bg-primary text-primary-foreground shadow-lg" : "size-6",
+                active && !isNew && "-translate-y-0.5 motion-safe:scale-110",
               )}
             >
               <Icon className="size-5" />

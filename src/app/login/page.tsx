@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { Fragment, type CSSProperties } from "react";
 
 import { LensMark } from "@/components/shared/LensMark";
 import { LoginForm } from "@/features/auth/LoginForm";
@@ -14,6 +15,8 @@ interface Branding {
   brand_color: string;
 }
 
+const HEADLINE_WORDS = "Every frame, every lens, every sale — at the counter.".split(" ");
+
 export default async function LoginPage() {
   const supabase = await createClient();
   const { data } = await supabase.rpc("shop_branding");
@@ -22,16 +25,17 @@ export default async function LoginPage() {
   return (
     <main
       className="grid min-h-dvh lg:grid-cols-[1.1fr_1fr]"
-      style={{ "--brand": brand.brand_color } as React.CSSProperties}
+      style={{ "--brand": brand.brand_color } as CSSProperties}
     >
       <section className="relative isolate flex min-h-56 flex-col justify-between overflow-hidden bg-primary p-8 text-primary-foreground lg:min-h-dvh lg:p-12">
-        {/* Two lenses with a coating reflex drifting behind the brand. */}
-        <div aria-hidden className="drift absolute -right-24 -bottom-28 -z-10 size-[26rem] rounded-full border-[18px] border-white/10 lg:size-[34rem]" />
+        {/* A coating reflex drifting behind the brand, and a large lens outline drawing itself on. */}
         <div
           aria-hidden
           className="drift absolute -right-4 bottom-40 -z-10 hidden size-72 rounded-full opacity-60 blur-2xl coating lg:block"
           style={{ animationDelay: "-5s" }}
         />
+        <LensMark animated className="float absolute -right-10 -bottom-6 -z-10 h-44 w-80 opacity-[0.14] lg:-right-16 lg:bottom-10 lg:h-72 lg:w-[30rem]" />
+
         <div className="flex items-center gap-3">
           {brand.logo_url ? (
             <Image src={brand.logo_url} alt="" width={44} height={44} className="size-11 rounded-xl bg-white object-contain p-1" />
@@ -40,11 +44,19 @@ export default async function LoginPage() {
           )}
           <span className="font-heading text-lg font-semibold">{brand.shop_name}</span>
         </div>
-        <div className="page-enter max-w-md">
+
+        <div className="max-w-md">
           <h1 className="font-heading text-4xl leading-[1.05] font-bold sm:text-5xl lg:text-6xl">
-            Every frame, every lens, every sale — at the counter.
+            {HEADLINE_WORDS.map((word, i) => (
+              <Fragment key={`${word}-${i}`}>
+                <span className="word-in" style={{ "--i": i } as CSSProperties}>
+                  {word}
+                </span>
+                {i < HEADLINE_WORDS.length - 1 && " "}
+              </Fragment>
+            ))}
           </h1>
-          {brand.tagline && <p className="mt-4 text-lg text-white/70">{brand.tagline}</p>}
+          {brand.tagline && <p className="fade-up mt-4 text-lg text-white/70">{brand.tagline}</p>}
         </div>
       </section>
 
